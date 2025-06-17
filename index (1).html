@@ -1,0 +1,155 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Я ненавижу Юлю</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ffd700, #ffcc00);
+            font-family: 'Arial Black', sans-serif;
+            overflow: hidden;
+            color: #ff4500;
+        }
+
+        .container {
+            text-align: center;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        h1.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 10px;
+            background-color: #ff4500;
+            color: #ffd700;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 69, 0, 0.7);
+        }
+
+        .cross {
+            font-size: 2rem;
+            position: absolute;
+            animation: explode 2s ease-in-out forwards;
+            opacity: 0;
+            color: #ff4500;
+        }
+
+        .cross.show {
+            opacity: 1;
+            animation: explode 2s ease-in-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2) translateY(-50px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="hateText">Я ебучий ненавижу Юлю, сука!</h1>
+        <button onclick="showHate()">Жми, блин!</button>
+    </div>
+
+    <script>
+        function showHate() {
+            const hateText = document.getElementById('hateText');
+            hateText.classList.add('show');
+
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    createCross();
+                }, i * 200);
+            }
+        }
+
+        function createCross() {
+            const cross = document.createElement('div');
+            cross.classList.add('cross');
+            cross.innerHTML = '✖';
+            cross.style.left = `${Math.random() * window.innerWidth}px`;
+            cross.style.top = `${window.innerHeight - 50}px`;
+            document.body.appendChild(cross);
+
+            setTimeout(() => {
+                cross.classList.add('show');
+            }, 10);
+
+            setTimeout(() => {
+                cross.remove();
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
