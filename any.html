@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Для Ани</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Нажми на кнопочку 👇</h1>
+    <button id="showMessage">Показать пожелание</button>
+    <p id="message" class="hidden">Ань, хорошего тебе дня! 💖 Ты самая милая!</p>
+  </div>
+
+  <script>
+    document.getElementById("showMessage").addEventListener("click", () => {
+      document.getElementById("message").classList.remove("hidden");
+      document.getElementById("message").classList.add("fade-in");
+    });
+  </script>
+</body>
+</html>
